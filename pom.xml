@@ -31,6 +31,11 @@
             <artifactId>item-nbt-api</artifactId>
             <version>92c3e14d4a</version>
         </dependency>
+        <dependency>
+            <groupId>fr.minuskube.inv</groupId>
+            <artifactId>smart-invs</artifactId>
+            <version>1.2.7</version>
+        </dependency>
     </dependencies>
 
     <build>
