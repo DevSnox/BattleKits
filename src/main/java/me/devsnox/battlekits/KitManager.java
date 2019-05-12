@@ -4,6 +4,7 @@ import de.tr7zw.itemnbtapi.NBTItem;
 import me.devsnox.battlekits.kits.kit.BattleKit;
 import me.devsnox.battlekits.kits.entites.KitPlayer;
 import me.devsnox.battlekits.kits.kit.KitType;
+import me.devsnox.battlekits.kits.loader.BasicPlayerLoader;
 import me.devsnox.battlekits.listeners.FrameListener;
 import me.devsnox.battlekits.kits.loader.BasicKitLoader;
 import me.devsnox.battlekits.kits.loader.PlayerLoader;
@@ -37,7 +38,7 @@ public class KitManager {
     }
 
     public void enable() {
-        this.playerLoader = new PlayerLoader(this);
+        this.playerLoader = new BasicPlayerLoader(this, plugin.getDataFolder());
         this.playerCache = new HashMap<>();
         this.openingChache = new ArrayList<>();
         this.kitLoader = new BasicKitLoader(this.plugin.getDataFolder());
