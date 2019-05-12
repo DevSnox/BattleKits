@@ -21,11 +21,8 @@ public class ShardCommand implements CommandExecutor {
 
             if(player.hasPermission("battlekits.getshard")) {
                 if(args.length == 1) {
-                    try {
-                        player.getInventory().addItem(this.kitManager.getShard(Integer.valueOf(args[0])));
-                        return true;
-                    } catch (Exception ex) {
-                    }
+                    player.getInventory().addItem(this.kitManager.getShard(Integer.valueOf(args[0])));
+                    return true;
                 }
 
                 player.sendMessage("§cBenutze /" + command.getName() + " <id>");
