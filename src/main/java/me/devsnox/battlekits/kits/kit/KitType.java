@@ -25,7 +25,7 @@ public enum KitType {
         return color;
     }
 
-    int getDurability() {
+    public int getDurability() {
         return this.durability;
     }
 
