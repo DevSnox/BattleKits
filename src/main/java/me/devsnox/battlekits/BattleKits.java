@@ -1,5 +1,6 @@
 package me.devsnox.battlekits;
 
+import fr.minuskube.inv.InventoryManager;
 import me.devsnox.battlekits.commands.BoosterCommand;
 import me.devsnox.battlekits.commands.KitCommand;
 import me.devsnox.battlekits.commands.KitEditorCommand;
@@ -13,10 +14,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class BattleKits extends JavaPlugin {
 
+    private InventoryManager inventoryManager;
     private KitManager kitManager;
 
     @Override
     public void onEnable() {
+        this.inventoryManager = new InventoryManager(this);
+        this.inventoryManager.init();
+
         this.kitManager = new KitManager(this);
         this.kitManager.enable();
 
