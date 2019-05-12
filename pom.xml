@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.github.AstrideUG.DarkBedrock</groupId>
             <artifactId>Darkness-Spigot</artifactId>
-            <version>47f9ac7255</version>
+            <version>205986e2dd</version>
         </dependency>
     </dependencies>
 
