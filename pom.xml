@@ -20,6 +20,12 @@
             <groupId>com.github.DevSnox</groupId>
             <artifactId>ItemProtection</artifactId>
             <version>cdac3f5e2d</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.DevSnox.ItemProtection</groupId>
+                    <artifactId>DarkFrame</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -35,6 +41,11 @@
             <groupId>fr.minuskube.inv</groupId>
             <artifactId>smart-invs</artifactId>
             <version>1.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.AstrideUG.DarkBedrock</groupId>
+            <artifactId>Darkness-Spigot</artifactId>
+            <version>47f9ac7255</version>
         </dependency>
     </dependencies>
 
