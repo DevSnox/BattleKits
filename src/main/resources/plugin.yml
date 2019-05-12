@@ -1,6 +1,6 @@
 name: BattleKits
 author: DevSnox
-version: 1.0
+version: "0.1-SNAPSHOT"
 main: me.devsnox.battlekits.BattleKits
 depends: [ItemNBTAPI, ItemProtection]
 commands:
