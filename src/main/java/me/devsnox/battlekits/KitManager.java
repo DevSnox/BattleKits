@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class KitManager {
@@ -26,8 +27,8 @@ public class KitManager {
     private KitLoader kitLoader;
 
     private PlayerLoader playerLoader;
-    private PlayerCache playerCache;
-    private OpeningChache openingChache;
+    private Map<UUID, KitPlayer> playerCache;
+    private ArrayList<Player> openingChache;
 
     private FrameListener frameListener;
 
@@ -37,8 +38,8 @@ public class KitManager {
 
     public void enable() {
         this.playerLoader = new PlayerLoader(this);
-        this.playerCache = new PlayerCache();
-        this.openingChache = new OpeningChache();
+        this.playerCache = new HashMap<>();
+        this.openingChache = new ArrayList<>();
         this.kitLoader = new KitLoader(this.plugin);
         kitLoader.loadKits();
 
@@ -90,7 +91,7 @@ public class KitManager {
     }
 
     public ArrayList<BattleKit> getKitsByType(KitType kitType) {
-        ArrayList<BattleKit> kits = new ArrayList();
+        ArrayList<BattleKit> kits = new ArrayList<>();
 
         for(BattleKit battleKit : getKits().values()) {
             if(battleKit.getKitType() == kitType) {
