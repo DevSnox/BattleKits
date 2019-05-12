@@ -16,16 +16,13 @@ public class BoosterCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(sender instanceof Player) {
+        if (sender instanceof Player) {
             Player player = ((Player) sender).getPlayer();
 
-            if(player.hasPermission("battlekits.getbooster")) {
-                if(args.length == 1) {
-                    try {
-                        player.getInventory().addItem(this.kitManager.getBooster(Double.valueOf(args[0])));
-                        return true;
-                    } catch (Exception ex) {
-                    }
+            if (player.hasPermission("battlekits.getbooster")) {
+                if (args.length == 1) {
+                    player.getInventory().addItem(this.kitManager.getBooster(Double.valueOf(args[0])));
+                    return true;
                 }
 
                 player.sendMessage("§cBenutze /" + command.getName() + " <id>");
