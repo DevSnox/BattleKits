@@ -5,7 +5,7 @@ import me.devsnox.battlekits.kits.kit.BattleKit;
 import me.devsnox.battlekits.kits.entites.KitPlayer;
 import me.devsnox.battlekits.kits.kit.KitType;
 import me.devsnox.battlekits.listeners.FrameListener;
-import me.devsnox.battlekits.kits.loader.KitLoader;
+import me.devsnox.battlekits.kits.loader.BasicKitLoader;
 import me.devsnox.battlekits.kits.loader.PlayerLoader;
 import me.devsnox.battlekits.utils.ItemBuilder;
 import me.devsnox.itemprotection.api.ItemProtectionAPI;
@@ -24,7 +24,7 @@ public class KitManager {
 
     private Plugin plugin;
 
-    private KitLoader kitLoader;
+    private BasicKitLoader kitLoader;
 
     private PlayerLoader playerLoader;
     private Map<UUID, KitPlayer> playerCache;
@@ -40,7 +40,7 @@ public class KitManager {
         this.playerLoader = new PlayerLoader(this);
         this.playerCache = new HashMap<>();
         this.openingChache = new ArrayList<>();
-        this.kitLoader = new KitLoader(this.plugin);
+        this.kitLoader = new BasicKitLoader(this.plugin.getDataFolder());
         kitLoader.loadKits();
 
         for(Player player : Bukkit.getOnlinePlayers()) {
@@ -73,7 +73,7 @@ public class KitManager {
         this.playerCache.remove(uuid);
     }
 
-    public HashMap<Integer, BattleKit> getKits() {
+    public Map<Integer, BattleKit> getKits() {
         return this.kitLoader.getKits();
     }
 

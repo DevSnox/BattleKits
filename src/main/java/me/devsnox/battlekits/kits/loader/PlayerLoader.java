@@ -13,6 +13,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class PlayerLoader {
@@ -58,7 +59,7 @@ public class PlayerLoader {
     public KitPlayer loadPlayer(UUID uuid) {
         ResultSet resultSet = this.connection.query("SELECT * FROM " + this.table + " WHERE UUID='" + uuid + "'");
 
-        HashMap<Integer, BattleKit> rawKits = this.kitManager.getKits();
+        Map<Integer, BattleKit> rawKits = this.kitManager.getKits();
 
         HashMap<Integer, PlayerKit> kits = new HashMap<>();
 
