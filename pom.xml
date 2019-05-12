@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.github.DevSnox</groupId>
             <artifactId>ItemProtection</artifactId>
-            <version>08d2e6ce1c</version>
+            <version>cdac3f5e2d</version>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
