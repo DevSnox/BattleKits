@@ -15,45 +15,43 @@ import org.bukkit.inventory.ItemStack;
 public class BasicKitInventoryProvider implements InventoryProvider {
 
     @Override
-    public void init(Player player, InventoryContents contents) {
-        contents.fillRow(1, ClickableItem.empty(Items.space(7)));
-        contents.fillRow(2, ClickableItem.empty(Items.space(7)));
-        contents.fillRow(3, ClickableItem.empty(Items.space(7)));
-        contents.fillColumn(1, ClickableItem.empty(Items.space(15)));
-        contents.fillColumn(9, ClickableItem.empty(Items.space(15)));
+    public void init(final Player player, final InventoryContents contents) {
+        contents.fill(ClickableItem.empty(Items.space(7)));
+        contents.fillColumn(0, ClickableItem.empty(Items.space(15)));
+        contents.fillColumn(8, ClickableItem.empty(Items.space(15)));
 
         this.renderTypes(contents, KitType.RARE);
     }
 
     @Override
-    public void update(Player player, InventoryContents inventoryContents) {
+    public void update(final Player player, final InventoryContents inventoryContents) {
 
     }
 
-    private void renderTypes(InventoryContents contents, KitType target) {
+    private void renderTypes(final InventoryContents contents, final KitType target) {
 
-        int i = 2;
+        int i = 1;
 
-        for (KitType kitType : KitType.values()) {
+        for (final KitType kitType : KitType.values()) {
 
-            NBTItem nbtItem = new NBTItem(
+            final NBTItem nbtItem = new NBTItem(
                     new ItemBuilder(new ItemStack(Material.STAINED_GLASS_PANE))
-                    .setDurability((short) kitType.getDurability())
-                    .setDisplayName(kitType.getColor() + kitType.getName()).build()
+                            .setDurability((short) kitType.getDurability())
+                            .setDisplayName(kitType.getColor() + kitType.getName()).build()
             );
 
             nbtItem.setString("type", kitType.name());
 
-            contents.set(SlotPos.of(1, i), ClickableItem.of(nbtItem.getItem(), event -> {
-                if(!event.getCurrentItem().getItemMeta().hasEnchants()) {
-                    renderTypes(contents, KitType.valueOf(new NBTItem(event.getCurrentItem()).getString("type")));
+            contents.set(SlotPos.of(0, i), ClickableItem.of(nbtItem.getItem(), event -> {
+                if (!event.getCurrentItem().getItemMeta().hasEnchants()) {
+                    this.renderTypes(contents, KitType.valueOf(new NBTItem(event.getCurrentItem()).getString("type")));
                 }
             }));
 
             i += 2;
         }
 
-        contents.fillRect(SlotPos.of(3, 2), SlotPos.of(5, 8),
+        contents.fillRect(SlotPos.of(2, 1), SlotPos.of(4, 7),
                 ClickableItem.empty(Items.space(target.getDurability())));
     }
 }
