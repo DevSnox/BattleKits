@@ -1,10 +1,7 @@
 package me.devsnox.battlekits;
 
 import fr.minuskube.inv.InventoryManager;
-import me.devsnox.battlekits.commands.BoosterCommand;
-import me.devsnox.battlekits.commands.KitCommand;
-import me.devsnox.battlekits.commands.KitEditorCommand;
-import me.devsnox.battlekits.commands.ShardCommand;
+import me.devsnox.battlekits.commands.*;
 import me.devsnox.battlekits.listeners.FrameListener;
 import me.devsnox.battlekits.listeners.KitListener;
 import me.devsnox.battlekits.listeners.PlayerListener;
@@ -29,16 +26,17 @@ public class BattleKits extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this.kitManager), this);
         Bukkit.getPluginManager().registerEvents(new ShardListener(this.kitManager), this);
 
-        FrameListener frameListener = new FrameListener();
+        final FrameListener frameListener = new FrameListener();
 
         this.kitManager.setFrameListener(frameListener);
 
         Bukkit.getPluginManager().registerEvents(frameListener, this);
 
-        getCommand("kiteditor").setExecutor(new KitEditorCommand(this.kitManager));
-        getCommand("kits").setExecutor(new KitCommand(this.kitManager));
-        getCommand("getshard").setExecutor(new ShardCommand(this.kitManager));
-        getCommand("getbooster").setExecutor(new BoosterCommand(this.kitManager));
+        this.getCommand("kiteditor").setExecutor(new KitEditorCommand(this.kitManager));
+        this.getCommand("kits").setExecutor(new KitCommand(this.kitManager));
+        this.getCommand("getshard").setExecutor(new ShardCommand(this.kitManager));
+        this.getCommand("getbooster").setExecutor(new BoosterCommand(this.kitManager));
+        this.getCommand("preview").setExecutor(new PreviewTest());
     }
 
     @Override
