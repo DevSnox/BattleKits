@@ -1,0 +1,11 @@
+name: BattleKits
+authors: [
+  DevSnox,
+  Lars Artmann | LartyHD
+]
+version: 1.0.0
+main: me.devsnox.battlekits.BattleKits
+depend:
+  - DarkFrame
+  - ItemNBTAPI
+  - ItemProtection
