@@ -1,85 +1,82 @@
 package me.devsnox.battlekits.kits.loader
 
-import com.google.gson.JsonObject
 import me.devsnox.battlekits.KitManager
-import me.devsnox.battlekits.connection.ConnectionConfig
-import me.devsnox.battlekits.connection.SkyConnection
-import me.devsnox.battlekits.connection.SyncMySQL
+import me.devsnox.battlekits.configs.sqlStatements
+import me.devsnox.battlekits.functions.KitsP
+import me.devsnox.battlekits.functions.javaPlugin
 import me.devsnox.battlekits.kits.entites.KitPlayer
 import me.devsnox.battlekits.kits.kit.PlayerKit
-import net.darkdevelopers.darkbedrock.darkness.general.configs.toConfigMap
-import net.darkdevelopers.darkbedrock.darkness.general.functions.load
-import net.darkdevelopers.darkbedrock.darkness.general.functions.save
+import net.darkdevelopers.darkbedrock.darkness.general.configs.ConfigData
+import net.darkdevelopers.darkbedrock.darkness.general.databases.mysql.MySQL
 import net.darkdevelopers.darkbedrock.darkness.general.functions.toConfigData
-import net.darkdevelopers.darkbedrock.darkness.general.functions.toMap
-import org.bukkit.plugin.Plugin
-import java.sql.SQLException
+import java.sql.PreparedStatement
 import java.util.*
 
-class PlayerLoader(private val kitManager: KitManager) {
-    private val plugin: Plugin = kitManager.plugin
+class PlayerLoader(
+    private val kitManager: KitManager
+) {
 
-    private val table: String = "battlekits_users"
-
-    private val skyConnection: SkyConnection
-    private val connection: SyncMySQL?
+    private val configData: ConfigData = javaPlugin.dataFolder.toConfigData("mysql")
+    private val mySQL = MySQL(configData)
+    private val tableName: String get() = sqlStatements.tableName
 
     init {
-
-        val configData = plugin.dataFolder.toConfigData("mysql")
-        val map = configData.load<JsonObject>().toMap()
-        val connectionConfig = ConnectionConfig(map)
-        configData.save(connectionConfig.toConfigMap())
-
-        this.skyConnection = SkyConnection(connectionConfig)
-        this.skyConnection.connect()
-        this.connection = this.skyConnection.sync()
-
-        this.connection!!.update("CREATE TABLE IF NOT EXISTS $table (UUID VARCHAR(36), ID INT, LAST_RECEIVE BIGINT)")
+        createTable()
     }
 
-    fun existPlayer(uuid: UUID): Boolean {
-        val resultSet = this.connection!!.query("SELECT * FROM $table WHERE UUID='$uuid'")
-        try {
-            if (resultSet!!.next()) {
-                return true
-            }
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-
-        return false
+    private fun createTable() {
+        mySQL.updateSync(sqlStatements.createTable/*.prepared { setString(1, tableName) }*/)
     }
 
-    fun removePlayer(uuid: UUID) {
-        connection!!.update("DELETE * FROM $table WHERE UUID='$uuid'")
+    suspend fun existPlayer(uuid: UUID): Boolean {
+        val resultSet = mySQL.preparedQuery(sqlStatements.existsPlayer.prepared {
+            setString(1, tableName)
+            setString(2, uuid.toString())
+        })
+        return resultSet.next()
     }
 
-    fun loadPlayer(uuid: UUID): KitPlayer {
-        val resultSet = this.connection!!.query("SELECT * FROM " + this.table + " WHERE UUID='" + uuid + "'")
+    suspend fun loadPlayer(uuid: UUID): KitPlayer {
 
-        val rawKits = this.kitManager.kits
+        val resultSet = mySQL.preparedQuery(sqlStatements.loadPlayer.prepared {
+            setString(1, tableName)
+            setString(2, uuid.toString())
+        })
 
-        val kits = HashMap<Int, PlayerKit>()
+        val kits: KitsP = mutableMapOf()
 
-        try {
-            while (resultSet!!.next()) {
-                val id = resultSet.getInt("id")
-                if (rawKits.containsKey(id)) {
-                    kits[resultSet.getInt("ID")] =
-                        PlayerKit(resultSet.getInt("ID"), rawKits[id]!!, resultSet.getLong("LAST_RECEIVE"))
-                }
-            }
-        } catch (e: SQLException) {
-            e.printStackTrace()
+        while (resultSet.next()) {
+            val id = resultSet.getInt(sqlStatements.usersId)
+            val battleKit = kitManager.kits[id] ?: continue
+            kits[id] = PlayerKit(id, battleKit, resultSet.getLong(sqlStatements.usersLastReceive))
         }
 
         return KitPlayer(uuid, kits)
     }
 
-    fun savePlayer(kitPlayer: KitPlayer) {
-        for (playerKit in kitPlayer.kits.values) {
-            connection!!.update("INSERT INTO " + this.table + "(UUID, ID, LAST_RECEIVE) VALUES('" + kitPlayer.uuid + "', '" + playerKit.id + "', '" + playerKit.lastReceive + "')")
+    suspend fun savePlayer(kitPlayer: KitPlayer) {
+        //TODO improve this! NOW!!! YOU ARE A STUPID GUY!!!!! AHHHHHHHHHHHHHHH
+        kitPlayer.kits.values.forEach { playerKit ->
+            mySQL.preparedUpdate(sqlStatements.createPlayer.prepared {
+                setString(1, tableName)
+                setString(2, kitPlayer.uuid.toString())
+                setInt(3, playerKit.id)
+                setLong(4, playerKit.lastReceive)
+            })
         }
     }
+
+    suspend fun deletePlayer(uuid: UUID): Unit = mySQL.preparedUpdate(sqlStatements.deletePlayer.prepared {
+        setString(1, tableName)
+        setString(2, uuid.toString())
+    })
+
+    private fun String.prepared(change: PreparedStatement.() -> Unit): PreparedStatement {
+        val preparedStatement = mySQL.preparedStatement(this).save()
+        preparedStatement.change()
+        return preparedStatement
+    }
+
+    private fun PreparedStatement?.save(): PreparedStatement =
+        this ?: throw IllegalStateException("mySQL.connection can not be null")
 }

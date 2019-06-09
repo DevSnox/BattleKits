@@ -25,8 +25,6 @@ class KitLoader(plugin: Plugin) {
 
         try {
 
-            plugin.dataFolder.toConfigData("config", suffix = ".yml")
-
             kits[1] = BattleKit(
                 1,
                 "test",

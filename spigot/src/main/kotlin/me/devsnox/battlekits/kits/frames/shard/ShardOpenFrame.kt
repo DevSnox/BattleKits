@@ -1,11 +1,13 @@
 package me.devsnox.battlekits.kits.frames.shard
 
 import me.devsnox.battlekits.KitManager
+import me.devsnox.battlekits.functions.javaPlugin
 import me.devsnox.battlekits.inventory.Frame
 import me.devsnox.battlekits.kits.kit.BattleKit
 import net.darkdevelopers.darkbedrock.darkness.spigot.builder.item.ItemBuilder
 import net.darkdevelopers.darkbedrock.darkness.spigot.functions.glow
 import net.darkdevelopers.darkbedrock.darkness.spigot.functions.schedule
+import net.darkdevelopers.darkbedrock.darkness.spigot.utils.setGlass
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -19,10 +21,9 @@ import java.util.concurrent.ThreadLocalRandom
 class ShardOpenFrame(
     private val kitManager: KitManager,
     private val battleKit: BattleKit,
-    private val chance: Double
+    private val chance: Double,
+    private val plugin: Plugin = javaPlugin
 ) : Frame(27, "§b§lShard", true) {
-
-    private val plugin: Plugin = kitManager.plugin
 
     override fun render(player: Player) {
         kitManager.setPlayerOpening(player, true)
@@ -62,14 +63,9 @@ class ShardOpenFrame(
                                     delay += 1.0 / (20.0 * ThreadLocalRandom.current().nextInt(10, 15))
                                     if (ticks > delay * 10.0) {
                                         ticks = 0
-                                        inventory.setItem(
-                                            location,
-                                            ItemStack(Material.STAINED_GLASS_PANE, 1, 7.toByte().toShort())
-                                        )
-                                        inventory.setItem(
-                                            location2,
-                                            ItemStack(Material.STAINED_GLASS_PANE, 1, 7.toByte().toShort())
-                                        )
+
+                                        inventory.setGlass(location, 7)
+                                        inventory.setGlass(location2, 7)
                                         if (location == 8) status = 1
                                         if (location == 0) status = 0
                                         if (status == 0) {
@@ -80,70 +76,47 @@ class ShardOpenFrame(
                                             location--
                                             location2--
                                         }
-                                        inventory.setItem(
-                                            location,
-                                            ItemStack(Material.STAINED_GLASS_PANE, 1, 10.toByte().toShort())
-                                        )
+                                        inventory.setGlass(location, 10)
                                         inventory.setItem(location2, ItemStack(Material.HOPPER))
                                         if (delay >= 1.0) {
-                                            inventory.setItem(
-                                                location,
-                                                ItemStack(Material.STAINED_GLASS_PANE, 1, 10.toByte().toShort())
-                                            )
-                                            inventory.setItem(
-                                                location2,
-                                                ItemStack(Material.STAINED_GLASS_PANE, 1, 10.toByte().toShort())
-                                            )
-                                            for (i in 9..17) {
-                                                if (i == location + 9) {
-                                                    continue
-                                                } else {
-                                                    inventory.setItem(i, ItemStack(Material.AIR, i))
-                                                    player.playSound(player.location, Sound.LEVEL_UP, 9999f, 9999f)
+                                            inventory.setGlass(location, 10)
+                                            inventory.setGlass(location2, 10)
+                                            for (i in 9..17) if (i == location + 9) continue else {
+                                                inventory.setItem(i, ItemStack(Material.AIR))
+                                                player.playSound(player.location, Sound.LEVEL_UP, 9999f, 9999f)
+                                            }
+                                            plugin.schedule(delay = 30L) {
+                                                var count = 0
+                                                plugin.schedule(period = 10L) {
+                                                    if (count == 8) {
+                                                        plugin.schedule {
+                                                            kitManager.getPlayer(player.uniqueId)!!.addKit(
+                                                                battleKit
+                                                            )
+                                                            kitManager.setPlayerOpening(player, false)
+                                                            player.closeInventory()
+                                                        }
+                                                        cancel()
+                                                    }
+                                                    val itemStack = inventory.getItem(location)
+                                                    val itemStack2 = inventory.getItem(location2)
+                                                    if (itemStack.durability.toInt() == 5) {
+                                                        itemStack.durability = 14.toShort()
+                                                        itemStack2.durability = 14.toShort()
+                                                    } else {
+                                                        itemStack.durability = 5.toShort()
+                                                        itemStack2.durability = 5.toShort()
+                                                    }
+                                                    count++
                                                 }
                                             }
-                                            object : BukkitRunnable() {
-                                                override fun run() {
-                                                    object : BukkitRunnable() {
-                                                        var count = 0
-
-                                                        override fun run() {
-                                                            if (count == 8) {
-                                                                object : BukkitRunnable() {
-                                                                    override fun run() {
-                                                                        this@ShardOpenFrame.kitManager.getPlayer(player.uniqueId)!!.addKit(
-                                                                            this@ShardOpenFrame.battleKit
-                                                                        )
-                                                                        this@ShardOpenFrame.kitManager.setPlayerOpening(
-                                                                            player,
-                                                                            false
-                                                                        )
-                                                                        player.closeInventory()
-                                                                    }
-                                                                }.runTask(this@ShardOpenFrame.plugin)
-                                                                cancel()
-                                                            }
-                                                            val itemStack = inventory.getItem(location)
-                                                            val itemStack2 = inventory.getItem(location2)
-                                                            if (itemStack.durability.toInt() == 5) {
-                                                                itemStack.durability = 14.toShort()
-                                                                itemStack2.durability = 14.toShort()
-                                                            } else {
-                                                                itemStack.durability = 5.toShort()
-                                                                itemStack2.durability = 5.toShort()
-                                                            }
-                                                            count++
-                                                        }
-                                                    }.runTaskTimer(this@ShardOpenFrame.plugin, 0L, 10L)
-                                                }
-                                            }.runTaskLater(this@ShardOpenFrame.plugin, 30L)
                                             cancel()
                                         }
                                     }
                                 }
-                            }.runTaskTimer(this@ShardOpenFrame.plugin, 0L, 1L)
+                            }.runTaskTimer(plugin, 0L, 1L)
                         }
-                    }.runTaskLater(this@ShardOpenFrame.plugin, 20L)
+                    }.runTaskLater(plugin, 20L)
                     cancel()
                 }
                 for (i in 17 downTo 9) {

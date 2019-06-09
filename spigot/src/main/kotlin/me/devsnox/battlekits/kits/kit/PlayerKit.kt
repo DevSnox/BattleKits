@@ -2,7 +2,7 @@ package me.devsnox.battlekits.kits.kit
 
 import java.util.concurrent.TimeUnit
 
-class PlayerKit(
+data class PlayerKit(
     val id: Int,
     val battleKit: BattleKit,
     var lastReceive: Long

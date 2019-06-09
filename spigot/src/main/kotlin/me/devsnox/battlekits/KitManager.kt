@@ -31,13 +31,13 @@ class KitManager(
 
     val kits: KitsB get() = kitLoader.kits
 
-    fun enable() {
+    suspend fun enable() {
         kitLoader.loadKits()
 
         for (player in players) loadPlayer(player.uniqueId)
     }
 
-    fun disable() {
+    suspend fun disable() {
         for (player in players) {
             savePlayer(player.uniqueId)
             player.closeInventory()
@@ -47,11 +47,11 @@ class KitManager(
 
     fun getPlayer(uuid: UUID): KitPlayer? = playerCache[uuid]
 
-    fun loadPlayer(uuid: UUID) {
+    suspend fun loadPlayer(uuid: UUID) {
         playerCache[uuid] = playerLoader.loadPlayer(uuid)
     }
 
-    fun savePlayer(uuid: UUID) {
+    suspend fun savePlayer(uuid: UUID) {
         val kitPlayer = playerCache[uuid] ?: return
         playerLoader.savePlayer(kitPlayer)
         playerCache.remove(uuid)

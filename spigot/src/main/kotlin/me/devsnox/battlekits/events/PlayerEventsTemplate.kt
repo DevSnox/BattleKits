@@ -1,5 +1,6 @@
 package me.devsnox.battlekits.events
 
+import kotlinx.coroutines.runBlocking
 import me.devsnox.battlekits.KitManager
 import net.darkdevelopers.darkbedrock.darkness.spigot.events.PlayerDisconnectEvent
 import net.darkdevelopers.darkbedrock.darkness.spigot.functions.events.listen
@@ -11,10 +12,10 @@ class PlayerEventsTemplate(private val kitManager: KitManager) : EventsTemplate(
 
     override fun setup(plugin: Plugin) {
         listen<PlayerJoinEvent>(plugin) { event ->
-            kitManager.loadPlayer(event.player.uniqueId)
+            runBlocking { kitManager.loadPlayer(event.player.uniqueId) }
         }.add()
         listen<PlayerDisconnectEvent>(plugin) { event ->
-            kitManager.savePlayer(event.player.uniqueId)
+            runBlocking { kitManager.savePlayer(event.player.uniqueId) }
         }.add()
     }
 
